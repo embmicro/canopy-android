@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.embeddedmicro.branch" android:versionName="1.11" android:versionCode="3">
+	package="com.embeddedmicro.branch" android:versionName="1.12" android:versionCode="4">
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<service android:label="@string/app_name" android:name="BranchWallpaper"
 			android:permission="android.permission.BIND_WALLPAPER">

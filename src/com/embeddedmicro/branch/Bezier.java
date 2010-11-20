@@ -27,10 +27,6 @@ public class Bezier {
 	public static Bezier getCurve(Vector2D v1, Vector2D v2, Vector2D v3,
 			Vector2D v4) {
 		Bezier curve = new Bezier();
-		curve.a = new Vector2D();
-		curve.b = new Vector2D();
-		curve.c = new Vector2D();
-		curve.d = new Vector2D();
 
 		curve.a.x = v2.x;
 		curve.b.x = v2.x + (v3.x - v1.x) / 6;
@@ -86,11 +82,22 @@ public class Bezier {
 		ay = d.y - a.y - cy - by;
 		mx = (3 * ax * t * t + 2 * bx * t + cx);
 		my = (3 * ay * t * t + 2 * by * t + cy);
+
 		if (mx == 0.0f && my == 0.0f)
 			return 0.0f;
-		float ang = (float) Math.acos(mx / Math.sqrt(mx * mx + my * my));
+
+		float ang = (float) (mx / Math.sqrt(mx * mx + my * my));
+		
+		if (ang < -1.0f)
+			ang = -1.0f;
+		else if (ang > 1.0f)
+			ang = 1.0f;
+		
+		ang = (float) Math.acos(ang);
+		
 		if (my < 0.0f)
 			ang = -ang;
+		
 		return (float) (ang - Math.PI / 2);
 	}
 
