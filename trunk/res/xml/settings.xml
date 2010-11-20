@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	android:key="branch_settings">
+
+	<PreferenceCategory android:key="style"
+		android:title="@string/style_title">
+		<com.embeddedmicro.branch.ColorPreference
+			android:key="branch_color" android:defaultValue="0xFFFFFFFF"
+			android:title="@string/branch_color_title" android:summary="@string/branch_color_summary" />
+		<com.embeddedmicro.branch.ColorPreference
+			android:key="background_color" android:defaultValue="0xFF000000"
+			android:title="@string/background_color_title" android:summary="@string/background_color_summary" />
+		<com.embeddedmicro.branch.SeekBarPreference
+			android:key="branches" android:title="Branches" android:summary="Maximum number of branches"
+			android:defaultValue="40" android:maxLevel="150" android:minLevel="1" />
+		<com.embeddedmicro.branch.SeekBarPreference
+			android:key="twigs" android:title="Twigs" android:summary="Number of twigs per branch"
+			android:defaultValue="7" android:maxLevel="15" android:minLevel="1" />
+		<com.embeddedmicro.branch.SeekBarPreference
+			android:key="crook" android:title="Crookedness"
+			android:summary="Set how crooked the branches can get"
+			android:defaultValue="20" android:maxLevel="100" android:minLevel="0" />
+		<com.embeddedmicro.branch.SeekBarPreference
+			android:key="vert" android:title="Vertices" android:summary="Number of vertices per branch"
+			android:defaultValue="5" android:maxLevel="30" android:minLevel="3" />
+		<com.embeddedmicro.branch.SeekBarPreference
+			android:key="grow" android:title="Growing Speed" android:summary="Set how fast the branches grow"
+			android:defaultValue="500" android:text=" ms" android:maxLevel="4000"
+			android:minLevel="1" />
+		<com.embeddedmicro.branch.SeekBarPreference
+			android:key="zoom" android:title="Zoom Speed" android:summary="Set the to zoom in"
+			android:defaultValue="5" android:maxLevel="10" android:minLevel="1" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory android:title="@string/render_title"
+		android:key="render">
+		<CheckBoxPreference android:key="antialias"
+			android:defaultValue="true" android:summaryOn="@string/antialias_on"
+			android:summaryOff="@string/antialias_off" android:title="@string/antialias_title"
+			android:disableDependentsState="false"></CheckBoxPreference>
+		<com.embeddedmicro.branch.SeekBarPreference
+			android:key="fps" android:title="FPS" android:summary="Set the frames-per-second"
+			android:defaultValue="45" android:text=" fps" android:maxLevel="60"
+			android:minLevel="15" />
+	</PreferenceCategory>
+
+
+
+
+
+
+</PreferenceScreen>
