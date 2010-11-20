@@ -49,7 +49,7 @@ public class Vector2D {
 	public float angle() {
 		if (x == 0 && y == 0)
 			return 0;
-		float ang = x / Math.sqrt(x * x + y * y);
+		float ang = (float) (x / Math.sqrt(x * x + y * y));
 		if (ang < -1.0f)
 			ang = -1.0f;
 		else if (ang > 1.0f)
