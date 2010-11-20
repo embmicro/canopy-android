@@ -140,10 +140,6 @@ public class LiveWallpaperPainting extends Thread {
 		tree.set_branches(b);
 	}
 	
-	public void setGrow(int s){
-		tree.set_grow(s);
-	}
-	
 	public void setVert(int v){
 		tree.set_vert(v);
 	}

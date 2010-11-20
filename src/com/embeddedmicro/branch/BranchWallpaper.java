@@ -65,11 +65,10 @@ public class BranchWallpaper extends WallpaperService {
 			painting.setAntiAlias(prefs.getBoolean("antialias", true));
 			painting.setFPS(prefs.getInt("fps", 45));
 			painting.setZoom(prefs.getInt("zoom", 5));
-			painting.setCrook(prefs.getInt("crook", 2));
-			painting.setVert(prefs.getInt("vert", 5));
+			painting.setCrook(prefs.getInt("crook", 20));
+			painting.setVert(prefs.getInt("vert", 10));
 			painting.setTwigs(prefs.getInt("twigs", 7));
-			painting.setBranches(prefs.getInt("branches", 40));
-			painting.setGrow(prefs.getInt("grow", 500));
+			painting.setBranches(prefs.getInt("branches", 50));
 		}
 
 		@Override
