@@ -21,7 +21,7 @@ public class Vector2D {
 		x = px;
 		y = py;
 	}
-	
+
 	public void set(Vector2D vec) {
 		x = vec.x;
 		y = vec.y;
@@ -49,7 +49,12 @@ public class Vector2D {
 	public float angle() {
 		if (x == 0 && y == 0)
 			return 0;
-		float ang = (float) Math.acos(x / Math.sqrt(x * x + y * y));
+		float ang = x / Math.sqrt(x * x + y * y);
+		if (ang < -1.0f)
+			ang = -1.0f;
+		else if (ang > 1.0f)
+			ang = 1.0f;
+		ang = (float) Math.acos(ang);
 		if (y < 0.0f)
 			ang = -ang;
 		return ang;

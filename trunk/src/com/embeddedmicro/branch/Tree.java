@@ -9,7 +9,7 @@ public class Tree {
 	private ArrayList<Branch> branches;
 	private Rectangle cullbounds;
 	private int width, height;
-	private Vector2D origin, center;
+	private Vector2D origin, center, zero;
 	private Paint paint;
 	private int clear_color;
 	private long time, inital_time, inital_delay;
@@ -25,18 +25,19 @@ public class Tree {
 		paint.setStrokeWidth(2);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStyle(Paint.Style.FILL);
+		zero = new Vector2D(0, 0);
 		time = inital_time = System.currentTimeMillis();
 	}
 
-	public void reset(){
+	public void reset() {
 		inital_time = System.currentTimeMillis();
 		branches.clear();
 	}
-	
+
 	public void set_dimentions(int w, int h) {
 		width = w;
 		height = h;
-		cullbounds = new Rectangle(-50, -50, width + 50, height + 50);
+		cullbounds = new Rectangle(-75, -75, width + 75, height + 75);
 		origin = new Vector2D(w / 2, h / 2);
 		center = new Vector2D(w / 2, h / 2);
 	}
@@ -239,12 +240,10 @@ public class Tree {
 				ty -= center.y;
 				if (tx != 0.0f || ty != 0.0f) {
 					m = (float) Math.sqrt(tx * tx + ty * ty);
-					if (m != 0.0f) {
-						tx /= m;
-						ty /= m;
-						tx *= 1000.0f / (float) (vert_factor * max_branches);
-						ty *= 1000.0f / (float) (vert_factor * max_branches);
-					}
+					tx /= m;
+					ty /= m;
+					tx *= 1000.0f / (float) (vert_factor * max_branches);
+					ty *= 1000.0f / (float) (vert_factor * max_branches);
 					dx += tx;
 					dy += ty;
 				}
@@ -268,7 +267,7 @@ public class Tree {
 		}
 
 		for (int i = 0; i < branches.size(); i++) {
-			branches.get(i).transform(origin, new Vector2D(0, 0), 1.0f + scale);
+			branches.get(i).transform(origin, zero, 1.0f + scale);
 		}
 		cullOffscreen();
 
