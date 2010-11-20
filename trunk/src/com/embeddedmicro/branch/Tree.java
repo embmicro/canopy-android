@@ -12,7 +12,7 @@ public class Tree {
 	private Vector2D origin, center;
 	private Paint paint;
 	private int clear_color;
-	private long time;
+	private long time, inital_time, inital_delay;
 	private int zoom_factor;
 	private float crook_factor;
 	private int vert_factor, twigs, max_branches, grow_speed;
@@ -25,9 +25,14 @@ public class Tree {
 		paint.setStrokeWidth(2);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStyle(Paint.Style.FILL);
-		time = System.currentTimeMillis();
+		time = inital_time = System.currentTimeMillis();
 	}
 
+	public void reset(){
+		inital_time = System.currentTimeMillis();
+		branches.clear();
+	}
+	
 	public void set_dimentions(int w, int h) {
 		width = w;
 		height = h;
@@ -122,29 +127,28 @@ public class Tree {
 	public void set_antialias(boolean aa) {
 		paint.setAntiAlias(aa);
 	}
-	
-	public void set_zoom(int z){
+
+	public void set_zoom(int z) {
 		zoom_factor = z;
+		grow_speed = -100 * z + 1500;
+		inital_delay = grow_speed * 10;
 	}
-	
-	public void set_crook(int c){
-		crook_factor = (float)c / 100.0f;
+
+	public void set_crook(int c) {
+		crook_factor = (float) c / 100.0f;
 	}
-	
-	public void set_vert(int v){
+
+	public void set_vert(int v) {
 		vert_factor = v;
 	}
-	
-	public void set_twigs(int t){
+
+	public void set_twigs(int t) {
 		twigs = t;
 	}
-	
-	public void set_branches(int b){
+
+	public void set_branches(int b) {
 		max_branches = b;
-	}
-	
-	public void set_grow(int s){
-		grow_speed = s;
+		reset();
 	}
 
 	public void add_branch(Vector2D orig, float sangle, float length,
@@ -238,8 +242,8 @@ public class Tree {
 					if (m != 0.0f) {
 						tx /= m;
 						ty /= m;
-						tx *= 5;
-						ty *= 5;
+						tx *= 1000.0f / (float) (vert_factor * max_branches);
+						ty *= 1000.0f / (float) (vert_factor * max_branches);
 					}
 					dx += tx;
 					dy += ty;
@@ -252,16 +256,22 @@ public class Tree {
 
 	public void update() {
 		update_origin();
-		
-		float scale = (float)(System.currentTimeMillis() - time);
+
+		float scale = (float) (System.currentTimeMillis() - time);
 		scale /= 10000.0f;
 		scale *= zoom_factor;
+
+		long t_rem = System.currentTimeMillis() - inital_time;
+
+		if (t_rem < inital_delay) {
+			scale *= ((float) t_rem / inital_delay);
+		}
 
 		for (int i = 0; i < branches.size(); i++) {
 			branches.get(i).transform(origin, new Vector2D(0, 0), 1.0f + scale);
 		}
-
 		cullOffscreen();
+
 		for (int i = branches.size() - 1; i >= 0; i--) {
 			split(i);
 		}
@@ -270,7 +280,7 @@ public class Tree {
 			add_branch(new Vector2D(width / 2, height),
 					(float) (Math.PI * 3 / 2), height * 0.8f, height / 50,
 					0.2f, 5, grow_speed);
-		
+
 		time = System.currentTimeMillis();
 	}
 }
