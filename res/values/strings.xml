@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<string name="app_name">Canopy Live Wallpaper</string>
+	<string name="description">Watch the canopy grow as you fall.</string>
+	<string name="branch_color_title">Branch Color</string>
+	<string name="branch_color_summary">Set the color of the branches</string>
+	<string name="settings_label">Canopy Settings</string>
+	<string name="background_color_title">Background Color</string>
+	<string name="background_color_summary">Set the color of the background</string>
+	<string name="antialias_title">Anti-Aliasing</string>
+	<string name="antialias_off">Turn on for smooth edges</string>
+	<string name="antialias_on">Turn off for a speed boost</string>
+	<string name="cwac_colormixer_red">R</string>
+	<string name="cwac_colormixer_green">G</string>
+	<string name="cwac_colormixer_blue">B</string>
+	<string name="cwac_colormixer_set">Set</string>
+	<string name="cwac_colormixer_cancel">Cancel</string>
+<string name="render_title">Rendering Settings</string>
+
+<string name="style_title">Branch Style</string>
+</resources>
