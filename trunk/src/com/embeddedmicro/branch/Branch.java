@@ -161,7 +161,7 @@ public class Branch {
 		if (tgen > 1.0f)
 			tgen = 1.0f;
 		
-		tgen = -(1-tgen)*(1-tgen)*(1-tgen)*(1-tgen) + 1;
+		tgen = (tgen-1)*(tgen-1)*(tgen-1) + 1;
 		
 		base = width * tgen;
 		float ratio = base / ((nVert - 1) * tgen);
@@ -198,7 +198,7 @@ public class Branch {
 				tgen = 1.0f;
 				grown = true;
 			}
-			tgen = -(1-tgen)*(1-tgen)*(1-tgen)*(1-tgen) + 1;
+			tgen = (tgen-1)*(tgen-1)*(tgen-1) + 1;
 			float u = tgen * (nVert - 1);
 			int uint = (int) Math.floor(u);
 			float uf = u - uint;
