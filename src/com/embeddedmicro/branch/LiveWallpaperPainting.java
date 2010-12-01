@@ -2,6 +2,8 @@ package com.embeddedmicro.branch;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
@@ -12,12 +14,15 @@ public class LiveWallpaperPainting extends Thread {
 	/** State */
 	private boolean wait;
 	private boolean run;
+	private boolean enabled;
 	private long time;
 	private int frame_rate;
+	private int height, width;
 
 	private Tree tree;
 
-	public LiveWallpaperPainting(SurfaceHolder surfaceHolder, Context context) {
+	public LiveWallpaperPainting(SurfaceHolder surfaceHolder, Context context,
+			boolean en) {
 		// keep a reference of the context and the surface
 		// the context is needed if you want to inflate
 		// some resources from your livewallpaper .apk
@@ -27,6 +32,11 @@ public class LiveWallpaperPainting extends Thread {
 		tree = new Tree();
 		time = System.currentTimeMillis();
 		frame_rate = 45;
+		enabled = en;
+	}
+
+	public void enable(boolean set) {
+		enabled = set;
 	}
 
 	/**
@@ -86,8 +96,9 @@ public class LiveWallpaperPainting extends Thread {
 					} catch (Exception e) {
 					}
 				}
-				diff = (1000/frame_rate) - (System.currentTimeMillis() - time);
-				if (diff > 0){
+				diff = (1000 / frame_rate)
+						- (System.currentTimeMillis() - time);
+				if (diff > 0) {
 					try {
 						wait(diff);
 					} catch (Exception e) {
@@ -100,8 +111,10 @@ public class LiveWallpaperPainting extends Thread {
 	/**
 	 * Invoke when the surface dimension change
 	 */
-	public void setSurfaceSize(int width, int height) {
-		tree.set_dimentions(width, height);
+	public void setSurfaceSize(int w, int h) {
+		tree.set_dimentions(w, h);
+		width = w;
+		height = h;
 		synchronized (this) {
 			this.notify();
 		}
@@ -119,40 +132,44 @@ public class LiveWallpaperPainting extends Thread {
 			notify();
 		}
 	}
-	
-	public void setFPS(int fps){
+
+	public void setFPS(int fps) {
 		frame_rate = fps;
 	}
 	
-	public void setZoom(int z){
+	public void setRainbow(boolean rainbow){
+		tree.set_rainbow(rainbow);
+	}
+
+	public void setZoom(int z) {
 		tree.set_zoom(z);
 	}
-	
-	public void setCrook(int c){
+
+	public void setCrook(int c) {
 		tree.set_crook(c);
 	}
-	
-	public void setTwigs(int t){
+
+	public void setTwigs(int t) {
 		tree.set_twigs(t);
 	}
-	
-	public void setBranches(int b){
+
+	public void setBranches(int b) {
 		tree.set_branches(b);
 	}
-	
-	public void setVert(int v){
+
+	public void setVert(int v) {
 		tree.set_vert(v);
 	}
-	
-	public void setBranchColor(int color){
+
+	public void setBranchColor(int color) {
 		tree.set_color(color);
 	}
-	
-	public void setBackgroundColor(int color){
+
+	public void setBackgroundColor(int color) {
 		tree.set_background(color);
 	}
-	
-	public void setAntiAlias(boolean aa){
+
+	public void setAntiAlias(boolean aa) {
 		tree.set_antialias(aa);
 	}
 
@@ -160,7 +177,19 @@ public class LiveWallpaperPainting extends Thread {
 	 * Do the actual drawing stuff
 	 */
 	private void doDraw(Canvas canvas) {
-		tree.draw(canvas);
+		if (enabled) {
+			tree.draw(canvas);
+		} else {
+			canvas.drawColor(0xff000000); //black
+			Paint paint = new Paint();
+			paint.setColor(0xffff0000);
+			paint.setTextAlign(Paint.Align.CENTER);
+			paint.setTextSize(20);
+			paint.setTypeface(Typeface.create("", Typeface.BOLD));
+			paint.setAntiAlias(true);
+			canvas.drawText("This application is not licensed.", width / 2, height / 2, paint);
+			wait = true;
+		}
 	}
 
 	/**

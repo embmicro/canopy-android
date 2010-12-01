@@ -16,6 +16,7 @@ public class Tree {
 	private int zoom_factor;
 	private float crook_factor;
 	private int vert_factor, twigs, max_branches, grow_speed;
+	private boolean rainbow;
 
 	Tree() {
 		branches = new ArrayList<Branch>();
@@ -125,6 +126,10 @@ public class Tree {
 		clear_color = color;
 	}
 
+	public void set_rainbow(boolean set) {
+		rainbow = set;
+	}
+
 	public void set_antialias(boolean aa) {
 		paint.setAntiAlias(aa);
 	}
@@ -171,12 +176,48 @@ public class Tree {
 		branches.get(last).set_start_angle(sangle);
 		branches.get(last).generate_center_curve();
 		branches.get(last).generate_normals();
+		branches.get(last).paint = new Paint(paint);
+		if (rainbow) {
+			branches.get(last).paint.setColor(generate_color());
+		}
+	}
+
+	private int generate_color() {
+		float hue = (float) (Math.random() * 6.0f);
+		float x = (1 - Math.abs(hue % 2 - 1)) * 255;
+		int r = 0, g = 0, b = 0;
+		if (hue >= 0.0f && hue < 1.0f) {
+			r = 255;
+			g = (int) x;
+			b = 0;
+		} else if (hue >= 1.0f && hue < 2.0f) {
+			r = (int) x;
+			g = 255;
+			b = 0;
+		} else if (hue >= 2.0f && hue < 3.0f) {
+			r = 0;
+			g = 255;
+			b = (int) x;
+		} else if (hue >= 3.0f && hue < 4.0f) {
+			r = 0;
+			g = (int) x;
+			b = 255;
+		} else if (hue >= 4.0f && hue < 5.0f) {
+			r = (int) x;
+			g = 0;
+			b = 255;
+		} else if (hue >= 5.0f && hue < 6.0f) {
+			r = 255;
+			g = 0;
+			b = (int) x;
+		}
+		return 0xff000000 | ((r & 255) << 16) | ((g & 255) << 8) | ((b & 255));
 	}
 
 	public void draw(Canvas canvas) {
 		canvas.drawColor(clear_color);
-		for (int i = 0; i < branches.size(); i++) {
-			paint.setAlpha(0xff);
+		for (int i = branches.size()-1; i >=0; i--) {
+			branches.get(i).paint.setAlpha(0xff);
 			if (branches.get(i).fadeTime == 0
 					&& branches.get(i).get_length() > height * 10) {
 				branches.get(i).fadeTime = branches.get(i).get_age();
@@ -187,11 +228,12 @@ public class Tree {
 					i--;
 					continue;
 				} else {
-					paint
+					branches.get(i).paint
 							.setAlpha((int) (0xff - ((float) (age) * 0xff / 1500)));
 				}
 			}
-			canvas.drawPath(branches.get(i).generate_path(), paint);
+			canvas.drawPath(branches.get(i).generate_path(),
+					branches.get(i).paint);
 		}
 	}
 
