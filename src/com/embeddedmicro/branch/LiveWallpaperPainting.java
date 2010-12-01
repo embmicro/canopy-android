@@ -184,7 +184,7 @@ public class LiveWallpaperPainting extends Thread {
 			Paint paint = new Paint();
 			paint.setColor(0xffff0000);
 			paint.setTextAlign(Paint.Align.CENTER);
-			paint.setTextSize(20);
+			paint.setTextSize(width/24);
 			paint.setTypeface(Typeface.create("", Typeface.BOLD));
 			paint.setAntiAlias(true);
 			canvas.drawText("This application is not licensed.", width / 2, height / 2, paint);
