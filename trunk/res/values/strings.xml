@@ -19,4 +19,7 @@
 <string name="render_title">Rendering Settings</string>
 
 <string name="style_title">Branch Style</string>
+<string name="rainbow_on">Uncheck to set colors manually</string>
+<string name="rainbow_off">Check for random branch colors</string>
+<string name="rainbow_title">Rainbow Mode</string>
 </resources>

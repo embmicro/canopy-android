@@ -6,10 +6,15 @@
 		android:title="@string/style_title">
 		<com.embeddedmicro.branch.ColorPreference
 			android:key="branch_color" android:defaultValue="0xFFFFFFFF"
-			android:title="@string/branch_color_title" android:summary="@string/branch_color_summary" />
+			android:title="@string/branch_color_title" android:dependency="rainbow"
+			android:summary="@string/branch_color_summary" />
+		<CheckBoxPreference android:summaryOff="@string/rainbow_off"
+			android:summaryOn="@string/rainbow_on" android:title="@string/rainbow_title"
+			android:key="rainbow" android:disableDependentsState="true"></CheckBoxPreference>
 		<com.embeddedmicro.branch.ColorPreference
 			android:key="background_color" android:defaultValue="0xFF000000"
 			android:title="@string/background_color_title" android:summary="@string/background_color_summary" />
+		
 		<com.embeddedmicro.branch.SeekBarPreference
 			android:key="branches" android:title="Branches" android:summary="Maximum number of branches"
 			android:defaultValue="50" android:maxLevel="150" android:minLevel="1" />
@@ -27,7 +32,8 @@
 			android:key="zoom" android:title="Speed" android:summary="Set the zoom speed"
 			android:defaultValue="5" android:maxLevel="10" android:minLevel="1" />
 
-	</PreferenceCategory>
+	
+</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/render_title"
 		android:key="render">
