@@ -21,10 +21,8 @@ import android.view.SurfaceHolder;
  */
 public class BranchWallpaper extends WallpaperService {
 
-	private static final String BASE64_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxySUsZ1pmHxhJwbailS61SK10RZEccLLoPulRs0KvaMyzP04hQzMZ+dJbhcfQAiaD7NkONDDwE6HNVefm3DYxO4sK4CiKCP2V3gQb+/NYamWz+WyKi8sN8AlDRlFCQg+aRmR5gWfMp/sHIEv/HJcK3Pal3Q+QheMqKkLBy0GFi9rULSOdp+MzZlPO3dLKU1DpDbXxIUx9S2JV1CAoo8niWabzPYADV1UUASiBSco0jrb7a+H+hmHuSSeYMxyir9ayRKVmqJOYhtcQCJp8FYTAFwj04UQX5C6fLswfnSjLNGaygAEgc7BL2ROaDfdKGGSm0IfhGs70zch08HmWmCJsQIDAQAB";
-
-	private static final byte[] SALT = new byte[] { 2, 100, 24, -100, -40, 7,
-			-65, -32, -84, 111, 3, 101, 25, -110, -43, 12, -53, -14, -98, 125 };
+	private static final String BASE64_PUBLIC_KEY = "":
+	private static final byte[] SALT = new byte[] {  };
 	private LicenseChecker mChecker;
 
 	private LicenseCheckerCallback mLicenseCheckerCallback;
