@@ -130,6 +130,14 @@ public class Tree {
 		rainbow = set;
 	}
 
+	public void set_wire(boolean set) {
+		if (set) {
+			paint.setStyle(Paint.Style.STROKE);
+		} else {
+			paint.setStyle(Paint.Style.FILL);
+		}
+	}
+
 	public void set_antialias(boolean aa) {
 		paint.setAntiAlias(aa);
 	}
@@ -216,7 +224,7 @@ public class Tree {
 
 	public void draw(Canvas canvas) {
 		canvas.drawColor(clear_color);
-		for (int i = branches.size()-1; i >=0; i--) {
+		for (int i = branches.size() - 1; i >= 0; i--) {
 			branches.get(i).paint.setAlpha(0xff);
 			if (branches.get(i).fadeTime == 0
 					&& branches.get(i).get_length() > height * 10) {

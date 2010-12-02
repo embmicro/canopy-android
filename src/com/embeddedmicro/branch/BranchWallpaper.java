@@ -1,13 +1,5 @@
 package com.embeddedmicro.branch;
 
-import java.util.ArrayList;
-
-import com.android.vending.licensing.AESObfuscator;
-import com.android.vending.licensing.LicenseChecker;
-import com.android.vending.licensing.LicenseCheckerCallback;
-import com.android.vending.licensing.ServerManagedPolicy;
-import com.android.vending.licensing.LicenseCheckerCallback.ApplicationErrorCode;
-
 import android.content.SharedPreferences;
 import android.provider.Settings.Secure;
 import android.service.wallpaper.WallpaperService;
@@ -21,74 +13,21 @@ import android.view.SurfaceHolder;
  */
 public class BranchWallpaper extends WallpaperService {
 
-	private static final String BASE64_PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxySUsZ1pmHxhJwbailS61SK10RZEccLLoPulRs0KvaMyzP04hQzMZ+dJbhcfQAiaD7NkONDDwE6HNVefm3DYxO4sK4CiKCP2V3gQb+/NYamWz+WyKi8sN8AlDRlFCQg+aRmR5gWfMp/sHIEv/HJcK3Pal3Q+QheMqKkLBy0GFi9rULSOdp+MzZlPO3dLKU1DpDbXxIUx9S2JV1CAoo8niWabzPYADV1UUASiBSco0jrb7a+H+hmHuSSeYMxyir9ayRKVmqJOYhtcQCJp8FYTAFwj04UQX5C6fLswfnSjLNGaygAEgc7BL2ROaDfdKGGSm0IfhGs70zch08HmWmCJsQIDAQAB";
-
-	private static final byte[] SALT = new byte[] { 2, 100, 24, -100, -40, 7,
-			-65, -32, -84, 111, 3, 101, 25, -110, -43, 12, -53, -14, -98, 125 };
-	private LicenseChecker mChecker;
-
-	private LicenseCheckerCallback mLicenseCheckerCallback;
-
 	public static final String PREFERENCES = "com.embeddedmicro.branch";
-
-	private boolean licensed = true;
-
-	private ArrayList<BranchEngine> engines = new ArrayList<BranchEngine>();
-
-	private class MyLicenseCheckerCallback implements LicenseCheckerCallback {
-		@Override
-		public void allow() {
-			licensed = true;
-			updateEngines(); 
-		}
-
-		@Override
-		public void applicationError(ApplicationErrorCode errorCode) {
-			licensed = false;
-			updateEngines();
-		}
-		
-		@Override
-		public void dontAllow() {
-			licensed = false;
-			updateEngines();
-		}
-	}
-
-	private void updateEngines() {
-		for (int i = 0; i < engines.size(); i++) {
-			engines.get(i).enable(licensed);
-		}
-	}
 
 	@Override
 	public Engine onCreateEngine() {
-		mChecker.checkAccess(mLicenseCheckerCallback);
-		engines.add(new BranchEngine(licensed));
-		return engines.get(engines.size() - 1);
+		return new BranchEngine();
 	}
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
-
-		// Try to use more data here. ANDROID_ID is a single point of attack.
-		String deviceId = Secure.getString(getContentResolver(),
-				Secure.ANDROID_ID);
-
-		// Library calls this when it's done.
-		mLicenseCheckerCallback = new MyLicenseCheckerCallback();
-		// Construct the LicenseChecker with a policy.
-		mChecker = new LicenseChecker(this, new ServerManagedPolicy(this,
-				new AESObfuscator(SALT, getPackageName(), deviceId)),
-				BASE64_PUBLIC_KEY);
-		mChecker.checkAccess(mLicenseCheckerCallback);
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		mChecker.onDestroy();
 	}
 
 	public class BranchEngine extends Engine implements
@@ -97,10 +36,10 @@ public class BranchWallpaper extends WallpaperService {
 		private LiveWallpaperPainting painting;
 		private SharedPreferences prefs;
 
-		BranchEngine(boolean run) {
+		BranchEngine() {
 			SurfaceHolder holder = getSurfaceHolder();
 			painting = new LiveWallpaperPainting(holder,
-					getApplicationContext(), run);
+					getApplicationContext());
 			prefs = BranchWallpaper.this.getSharedPreferences(PREFERENCES, 0);
 			prefs.registerOnSharedPreferenceChangeListener(this);
 			onSharedPreferenceChanged(prefs, null);
@@ -118,10 +57,6 @@ public class BranchWallpaper extends WallpaperService {
 			painting.stopPainting();
 		}
 
-		public void enable(boolean set) {
-			painting.enable(set);
-		}
-
 		public void onSharedPreferenceChanged(SharedPreferences prefs,
 				String key) {
 			boolean rainbow = prefs.getBoolean("rainbow", false);
@@ -133,6 +68,7 @@ public class BranchWallpaper extends WallpaperService {
 			painting.setBackgroundColor(prefs.getInt("background_color",
 					0xff000000));
 			painting.setAntiAlias(prefs.getBoolean("antialias", true));
+			painting.setWire(prefs.getBoolean("wire", false));
 			painting.setFPS(prefs.getInt("fps", 45));
 			painting.setZoom(prefs.getInt("zoom", 5));
 			painting.setCrook(prefs.getInt("crook", 20));

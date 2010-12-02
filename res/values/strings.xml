@@ -22,4 +22,7 @@
 <string name="rainbow_on">Uncheck to set colors manually</string>
 <string name="rainbow_off">Check for random branch colors</string>
 <string name="rainbow_title">Rainbow Mode</string>
+<string name="wire_title">Wireframe Mode</string>
+<string name="wire_on">Uncheck to fill the branches</string>
+<string name="wire_off">Check to enable wireframe</string>
 </resources>
