@@ -14,15 +14,13 @@ public class LiveWallpaperPainting extends Thread {
 	/** State */
 	private boolean wait;
 	private boolean run;
-	private boolean enabled;
 	private long time;
 	private int frame_rate;
 	private int height, width;
 
 	private Tree tree;
 
-	public LiveWallpaperPainting(SurfaceHolder surfaceHolder, Context context,
-			boolean en) {
+	public LiveWallpaperPainting(SurfaceHolder surfaceHolder, Context context) {
 		// keep a reference of the context and the surface
 		// the context is needed if you want to inflate
 		// some resources from your livewallpaper .apk
@@ -32,11 +30,6 @@ public class LiveWallpaperPainting extends Thread {
 		tree = new Tree();
 		time = System.currentTimeMillis();
 		frame_rate = 45;
-		enabled = en;
-	}
-
-	public void enable(boolean set) {
-		enabled = set;
 	}
 
 	/**
@@ -136,9 +129,13 @@ public class LiveWallpaperPainting extends Thread {
 	public void setFPS(int fps) {
 		frame_rate = fps;
 	}
-	
-	public void setRainbow(boolean rainbow){
+
+	public void setRainbow(boolean rainbow) {
 		tree.set_rainbow(rainbow);
+	}
+
+	public void setWire(boolean wire) {
+		tree.set_wire(wire);
 	}
 
 	public void setZoom(int z) {
@@ -177,19 +174,7 @@ public class LiveWallpaperPainting extends Thread {
 	 * Do the actual drawing stuff
 	 */
 	private void doDraw(Canvas canvas) {
-		if (enabled) {
-			tree.draw(canvas);
-		} else {
-			canvas.drawColor(0xff000000); //black
-			Paint paint = new Paint();
-			paint.setColor(0xffff0000);
-			paint.setTextAlign(Paint.Align.CENTER);
-			paint.setTextSize(width/24);
-			paint.setTypeface(Typeface.create("", Typeface.BOLD));
-			paint.setAntiAlias(true);
-			canvas.drawText("This application is not licensed.", width / 2, height / 2, paint);
-			wait = true;
-		}
+		tree.draw(canvas);
 	}
 
 	/**

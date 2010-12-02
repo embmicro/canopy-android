@@ -15,7 +15,7 @@
 			android:key="background_color" android:defaultValue="0xFF000000"
 			android:title="@string/background_color_title" android:summary="@string/background_color_summary" />
 		
-		<com.embeddedmicro.branch.SeekBarPreference
+		<CheckBoxPreference android:title="@string/wire_title" android:summaryOn="@string/wire_on" android:summaryOff="@string/wire_off" android:key="wire"></CheckBoxPreference><com.embeddedmicro.branch.SeekBarPreference
 			android:key="branches" android:title="Branches" android:summary="Maximum number of branches"
 			android:defaultValue="50" android:maxLevel="150" android:minLevel="1" />
 		<com.embeddedmicro.branch.SeekBarPreference
@@ -27,12 +27,13 @@
 			android:defaultValue="20" android:maxLevel="100" android:minLevel="0" />
 		<com.embeddedmicro.branch.SeekBarPreference
 			android:key="vert" android:title="Vertices" android:summary="Number of vertices per branch"
-			android:defaultValue="10" android:maxLevel="15" android:minLevel="3" />
+			android:defaultValue="10" android:maxLevel="30" android:minLevel="3" />
 		<com.embeddedmicro.branch.SeekBarPreference
 			android:key="zoom" android:title="Speed" android:summary="Set the zoom speed"
 			android:defaultValue="5" android:maxLevel="10" android:minLevel="1" />
 
 	
+
 </PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/render_title"
