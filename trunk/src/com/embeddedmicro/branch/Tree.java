@@ -10,13 +10,13 @@ public class Tree {
 	private Rectangle cullbounds;
 	private int width, height;
 	private Vector2D origin, center, zero;
-	private Paint paint;
+	private Paint paint, fillPaint;
 	private int clear_color;
 	private long time, inital_time, inital_delay;
 	private int zoom_factor;
 	private float crook_factor;
 	private int vert_factor, twigs, max_branches, grow_speed;
-	private boolean rainbow;
+	private boolean rainbow, wireFill;
 
 	Tree() {
 		branches = new ArrayList<Branch>();
@@ -26,8 +26,12 @@ public class Tree {
 		paint.setStrokeWidth(2);
 		paint.setStrokeCap(Paint.Cap.ROUND);
 		paint.setStyle(Paint.Style.FILL);
+		fillPaint = new Paint(paint);
+		fillPaint.setAntiAlias(false);
+		fillPaint.setColor(0xff000000);
 		zero = new Vector2D(0, 0);
 		time = inital_time = System.currentTimeMillis();
+		wireFill = true;
 	}
 
 	public void reset() {
@@ -124,10 +128,15 @@ public class Tree {
 
 	public void set_background(int color) {
 		clear_color = color;
+		fillPaint.setColor(color);
 	}
 
 	public void set_rainbow(boolean set) {
 		rainbow = set;
+	}
+
+	public void set_wirefill(boolean set) {
+		wireFill = set;
 	}
 
 	public void set_wire(boolean set) {
@@ -240,6 +249,12 @@ public class Tree {
 							.setAlpha((int) (0xff - ((float) (age) * 0xff / 1500)));
 				}
 			}
+
+			if (wireFill) {
+				fillPaint.setAlpha(branches.get(i).paint.getAlpha());
+				canvas.drawPath(branches.get(i).generate_path(), fillPaint);
+			}
+
 			canvas.drawPath(branches.get(i).generate_path(),
 					branches.get(i).paint);
 		}

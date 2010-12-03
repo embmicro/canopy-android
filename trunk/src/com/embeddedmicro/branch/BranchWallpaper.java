@@ -65,10 +65,17 @@ public class BranchWallpaper extends WallpaperService {
 				painting.setBranchColor(prefs
 						.getInt("branch_color", 0xffffffff));
 			}
+			boolean wire = prefs.getBoolean("wire", false);
+			painting.setWire(wire);
+			if (wire) {
+				painting.setFill(prefs.getBoolean("fill", false));
+			} else {
+				painting.setFill(false);
+			}
 			painting.setBackgroundColor(prefs.getInt("background_color",
 					0xff000000));
 			painting.setAntiAlias(prefs.getBoolean("antialias", true));
-			painting.setWire(prefs.getBoolean("wire", false));
+
 			painting.setFPS(prefs.getInt("fps", 45));
 			painting.setZoom(prefs.getInt("zoom", 5));
 			painting.setCrook(prefs.getInt("crook", 20));
