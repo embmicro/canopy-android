@@ -25,4 +25,7 @@
 <string name="wire_title">Wireframe Mode</string>
 <string name="wire_on">Uncheck to fill the branches</string>
 <string name="wire_off">Check to enable wireframe</string>
+<string name="fill_title">Fill Wireframe</string>
+<string name="fill_on">Uncheck for a speed boost</string>
+<string name="fill_off">Check to remove branch overlap</string>
 </resources>

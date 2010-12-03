@@ -138,6 +138,10 @@ public class LiveWallpaperPainting extends Thread {
 		tree.set_wire(wire);
 	}
 
+	public void setFill(boolean fill) {
+		tree.set_wirefill(fill);
+	}
+
 	public void setZoom(int z) {
 		tree.set_zoom(z);
 	}
