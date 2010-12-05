@@ -193,12 +193,12 @@ public class Branch {
 		animationTime = System.currentTimeMillis() - genTime;
 
 		float tgen = (float) animationTime / growDur;
+		tgen = (tgen-1)*(tgen-1)*(tgen-1) + 1;
 		if (grown == false) {
 			if (tgen > 1.0f) {
 				tgen = 1.0f;
 				grown = true;
 			}
-			tgen = (tgen-1)*(tgen-1)*(tgen-1) + 1;
 			float u = tgen * (nVert - 1);
 			int uint = (int) Math.floor(u);
 			float uf = u - uint;
