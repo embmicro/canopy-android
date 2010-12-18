@@ -217,7 +217,7 @@ public class Branch {
 								+ wVec[i + 1].x, c_bez[i].d.y + wVec[i + 1].y);
 			}
 
-			if (uf > 0) {
+			if (uf > 0 && uint < c_bez.length) {
 				Vector2D[] tip = Bezier.semiBezier(uf, c_bez[uint].a.x,
 						c_bez[uint].a.y, c_bez[uint].b.x, c_bez[uint].b.y,
 						c_bez[uint].c.x, c_bez[uint].c.y, c_bez[uint].d.x,
