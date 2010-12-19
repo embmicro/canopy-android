@@ -160,9 +160,9 @@ public class Branch {
 		float tgen = (float) animationTime / growDur;
 		if (tgen > 1.0f)
 			tgen = 1.0f;
-		
-		tgen = (tgen-1)*(tgen-1)*(tgen-1) + 1;
-		
+
+		tgen = (tgen - 1) * (tgen - 1) * (tgen - 1) + 1;
+
 		base = width * tgen;
 		float ratio = base / ((nVert - 1) * tgen);
 
@@ -193,7 +193,7 @@ public class Branch {
 		animationTime = System.currentTimeMillis() - genTime;
 
 		float tgen = (float) animationTime / growDur;
-		tgen = (tgen-1)*(tgen-1)*(tgen-1) + 1;
+		tgen = (tgen - 1) * (tgen - 1) * (tgen - 1) + 1;
 		if (grown == false) {
 			if (tgen > 1.0f) {
 				tgen = 1.0f;
@@ -206,44 +206,49 @@ public class Branch {
 			generate_widths();
 
 			draw.reset();
+			try {
+				// Side A
+				draw.moveTo(c_bez[0].a.x + wVec[0].x, c_bez[0].a.y + wVec[0].y);
 
-			// Side A
-			draw.moveTo(c_bez[0].a.x + wVec[0].x, c_bez[0].a.y + wVec[0].y);
+				for (int i = 0; i < uint; i++) {
+					draw.cubicTo(c_bez[i].b.x + wVec[i].x, c_bez[i].b.y
+							+ wVec[i].y, c_bez[i].c.x + wVec[i + 1].x,
+							c_bez[i].c.y + wVec[i + 1].y, c_bez[i].d.x
+									+ wVec[i + 1].x, c_bez[i].d.y
+									+ wVec[i + 1].y);
+				}
 
-			for (int i = 0; i < uint; i++) {
-				draw.cubicTo(c_bez[i].b.x + wVec[i].x,
-						c_bez[i].b.y + wVec[i].y, c_bez[i].c.x + wVec[i + 1].x,
-						c_bez[i].c.y + wVec[i + 1].y, c_bez[i].d.x
-								+ wVec[i + 1].x, c_bez[i].d.y + wVec[i + 1].y);
+				if (uf > 0 && uint < c_bez.length) {
+					Vector2D[] tip = Bezier.semiBezier(uf, c_bez[uint].a.x,
+							c_bez[uint].a.y, c_bez[uint].b.x, c_bez[uint].b.y,
+							c_bez[uint].c.x, c_bez[uint].c.y, c_bez[uint].d.x,
+							c_bez[uint].d.y);
+					draw.cubicTo(tip[0].x + wVec[uint].x, tip[0].y
+							+ wVec[uint].y, tip[1].x, tip[1].y, tip[2].x,
+							tip[2].y);
+					draw.cubicTo(tip[1].x, tip[1].y, tip[0].x - wVec[uint].x,
+							tip[0].y - wVec[uint].y, c_bez[uint].a.x
+									- wVec[uint].x, c_bez[uint].a.y
+									- wVec[uint].y);
+				}
+
+				for (int i = uint - 1; i >= 0; i--) {
+					draw.cubicTo(c_bez[i].c.x - wVec[i + 1].x, c_bez[i].c.y
+							- wVec[i + 1].y, c_bez[i].b.x - wVec[i].x,
+							c_bez[i].b.y - wVec[i].y, c_bez[i].a.x - wVec[i].x,
+							c_bez[i].a.y - wVec[i].y);
+				}
+
+				// Draw a smooth end
+				draw.cubicTo(c_bez[0].a.x - wVec[0].x + wVec[0].y, c_bez[0].a.y
+						- wVec[0].y - wVec[0].x, c_bez[0].a.x + wVec[0].x
+						+ wVec[0].y, c_bez[0].a.y + wVec[0].y - wVec[0].x,
+						c_bez[0].a.x + wVec[0].x, c_bez[0].a.y + wVec[0].y);
+
+				draw.close();
+			} catch (ArrayIndexOutOfBoundsException e) {
+
 			}
-
-			if (uf > 0 && uint < c_bez.length) {
-				Vector2D[] tip = Bezier.semiBezier(uf, c_bez[uint].a.x,
-						c_bez[uint].a.y, c_bez[uint].b.x, c_bez[uint].b.y,
-						c_bez[uint].c.x, c_bez[uint].c.y, c_bez[uint].d.x,
-						c_bez[uint].d.y);
-				draw.cubicTo(tip[0].x + wVec[uint].x, tip[0].y + wVec[uint].y,
-						tip[1].x, tip[1].y, tip[2].x, tip[2].y);
-				draw.cubicTo(tip[1].x, tip[1].y, tip[0].x - wVec[uint].x,
-						tip[0].y - wVec[uint].y,
-						c_bez[uint].a.x - wVec[uint].x, c_bez[uint].a.y
-								- wVec[uint].y);
-			}
-
-			for (int i = uint - 1; i >= 0; i--) {
-				draw.cubicTo(c_bez[i].c.x - wVec[i + 1].x, c_bez[i].c.y
-						- wVec[i + 1].y, c_bez[i].b.x - wVec[i].x, c_bez[i].b.y
-						- wVec[i].y, c_bez[i].a.x - wVec[i].x, c_bez[i].a.y
-						- wVec[i].y);
-			}
-
-			// Draw a smooth end
-			draw.cubicTo(c_bez[0].a.x - wVec[0].x + wVec[0].y, c_bez[0].a.y
-					- wVec[0].y - wVec[0].x, c_bez[0].a.x + wVec[0].x
-					+ wVec[0].y, c_bez[0].a.y + wVec[0].y - wVec[0].x,
-					c_bez[0].a.x + wVec[0].x, c_bez[0].a.y + wVec[0].y);
-
-			draw.close();
 		}
 
 		return draw;

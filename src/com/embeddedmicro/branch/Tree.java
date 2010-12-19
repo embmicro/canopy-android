@@ -232,31 +232,36 @@ public class Tree {
 	}
 
 	public void draw(Canvas canvas) {
-		canvas.drawColor(clear_color);
-		for (int i = branches.size() - 1; i >= 0; i--) {
-			branches.get(i).paint.setAlpha(0xff);
-			if (branches.get(i).fadeTime == 0
-					&& branches.get(i).get_length() > height * 10) {
-				branches.get(i).fadeTime = branches.get(i).get_age();
-			} else if (branches.get(i).fadeTime != 0) {
-				long age = branches.get(i).get_age() - branches.get(i).fadeTime;
-				if (age > 1500) {
-					branches.remove(i);
-					i--;
-					continue;
-				} else {
-					branches.get(i).paint
-							.setAlpha((int) (0xff - ((float) (age) * 0xff / 1500)));
+		try {
+			canvas.drawColor(clear_color);
+			for (int i = branches.size() - 1; i >= 0; i--) {
+				branches.get(i).paint.setAlpha(0xff);
+				if (branches.get(i).fadeTime == 0
+						&& branches.get(i).get_length() > height * 10) {
+					branches.get(i).fadeTime = branches.get(i).get_age();
+				} else if (branches.get(i).fadeTime != 0) {
+					long age = branches.get(i).get_age()
+							- branches.get(i).fadeTime;
+					if (age > 1500) {
+						branches.remove(i);
+						i--;
+						continue;
+					} else {
+						branches.get(i).paint
+								.setAlpha((int) (0xff - ((float) (age) * 0xff / 1500)));
+					}
 				}
-			}
 
-			if (wireFill) {
-				fillPaint.setAlpha(branches.get(i).paint.getAlpha());
-				canvas.drawPath(branches.get(i).generate_path(), fillPaint);
-			}
+				if (wireFill) {
+					fillPaint.setAlpha(branches.get(i).paint.getAlpha());
+					canvas.drawPath(branches.get(i).generate_path(), fillPaint);
+				}
 
-			canvas.drawPath(branches.get(i).generate_path(),
-					branches.get(i).paint);
+				canvas.drawPath(branches.get(i).generate_path(), branches
+						.get(i).paint);
+			}
+		} catch (IndexOutOfBoundsException e) {
+
 		}
 	}
 
