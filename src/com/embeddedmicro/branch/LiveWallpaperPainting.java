@@ -2,8 +2,6 @@ package com.embeddedmicro.branch;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 

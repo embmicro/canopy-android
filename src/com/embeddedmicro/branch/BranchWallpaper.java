@@ -1,7 +1,6 @@
 package com.embeddedmicro.branch;
 
 import android.content.SharedPreferences;
-import android.provider.Settings.Secure;
 import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;

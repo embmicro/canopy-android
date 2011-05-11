@@ -20,12 +20,14 @@ public class Branch {
 	private Path draw;
 	private Matrix matrix;
 	public Paint paint;
+	public boolean active;
 
 	Branch() {
 		genTime = System.currentTimeMillis();
 		fadeTime = 0;
 		grown = false;
 		split = false;
+		active = false;
 		bounds = new Rectangle();
 		draw = new Path();
 		matrix = new Matrix();
