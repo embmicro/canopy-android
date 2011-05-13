@@ -8,6 +8,7 @@ public class Branch {
 	private long animationTime;
 	private Vector2D[] center;
 	private Vector2D[] nVec, wVec;
+	private Vector2D[] tip;
 	private Bezier[] c_bez;
 	private int nVert;
 	private long genTime;
@@ -21,16 +22,27 @@ public class Branch {
 	private Matrix matrix;
 	public Paint paint;
 	public boolean active;
+	public int zbuf;
 
-	Branch() {
-		genTime = System.currentTimeMillis();
-		fadeTime = 0;
-		grown = false;
-		split = false;
+	Branch(int mV) {
 		active = false;
 		bounds = new Rectangle();
 		draw = new Path();
 		matrix = new Matrix();
+		tip = new Vector2D[3];
+		tip[0] = new Vector2D();
+		tip[1] = new Vector2D();
+		tip[2] = new Vector2D();
+		paint = new Paint();
+		set_maxVert(mV);
+		reset();
+	}
+	
+	public void reset(){
+		genTime = System.currentTimeMillis();
+		fadeTime = 0;
+		grown = false;
+		split = false;
 	}
 
 	public long get_age() {
@@ -59,12 +71,21 @@ public class Branch {
 
 	public void set_nVert(int v) {
 		nVert = v;
-		nVec = new Vector2D[nVert]; // Normal Vectors
-		wVec = new Vector2D[nVert];
-		for (int i = 0; i < nVert; i++) {
+	}
+	
+	public void set_maxVert(int v){
+		nVec = new Vector2D[v]; // Normal Vectors
+		wVec = new Vector2D[v];
+		center = new Vector2D[v];
+		for (int i = 0; i < v; i++) {
 			wVec[i] = new Vector2D();
+			nVec[i] = new Vector2D();
+			center[i] = new Vector2D();
 		}
-		c_bez = new Bezier[nVert - 1];
+		c_bez = new Bezier[v - 1];
+		for (int i = 0; i < v - 1; i++){
+			c_bez[i] = new Bezier();
+		}
 	}
 
 	public Vector2D get_point(float t) {
@@ -82,8 +103,18 @@ public class Branch {
 	}
 
 	public void set_center_path(Vector2D[] vec) {
-		center = vec;
+		for (int i = 0; i < nVert; i++){
+			center[i].set(vec[i]);
+		}
 		update_bounds();
+	}
+	
+	public void set_point(int i, float x, float y){
+		center[i].set(x,y);
+	}
+	
+	public void set_point(int i, Vector2D v){
+		center[i].set(v);
 	}
 
 	public Vector2D[] get_center_path() {
@@ -133,14 +164,14 @@ public class Branch {
 	public void generate_center_curve() {
 		// The first curve uses the same point for the first and second points
 		// because there is no previous point
-		c_bez[0] = Bezier.getCurve(center[0], center[0], center[1], center[2]);
+		c_bez[0].setCurve(center[0], center[0], center[1], center[2]);
 		for (int i = 1; i < nVert - 2; i++) {
-			c_bez[i] = Bezier.getCurve(center[i - 1], center[i], center[i + 1],
+			c_bez[i].setCurve(center[i - 1], center[i], center[i + 1],
 					center[i + 2]);
 		}
 		// The last curve uses the same point for the third and forth points
 		// because there is no next point
-		c_bez[nVert - 2] = Bezier.getCurve(center[nVert - 3],
+		c_bez[nVert - 2].setCurve(center[nVert - 3],
 				center[nVert - 2], center[nVert - 1], center[nVert - 1]);
 	}
 
@@ -150,12 +181,12 @@ public class Branch {
 		// You can't find the starting angle based on the vertices because when
 		// you take the derivative you end up with a 0/0 situation. So we use
 		// the starting angle instead.
-		nVec[0] = Vector2D.getPtDA(1.0f, (float) (start_angle - Math.PI / 2));
+		nVec[0].setPtDA(1.0f, (float) (start_angle - Math.PI / 2));
 
 		for (int i = 1; i < nVert - 1; i++) {
-			nVec[i] = Vector2D.getPtDA(1.0f, c_bez[i].getiAngle());
+			nVec[i].setPtDA(1.0f, c_bez[i].getiAngle());
 		}
-		nVec[nVert - 1] = new Vector2D(0.0f, 0.0f);
+		nVec[nVert - 1].set(0.0f, 0.0f);
 	}
 
 	private void generate_widths() {
@@ -190,6 +221,38 @@ public class Branch {
 			draw.transform(matrix);
 		}
 	}
+	
+	private void set_tip (float t, float x0, float y0, float x1,
+			float y1, float x2, float y2, float x3, float y3) {
+		if (t == 0.0f) {
+			tip[0].set(x0, y0);
+			tip[1].set(x0, y0);
+			tip[2].set(x0, y0);
+			return;
+		} else if (t == 1.0f) {
+			tip[0].set(x1, y1);
+			tip[1].set(x2, y2);
+			tip[2].set(x3, y3);
+			return;
+		}
+
+		float qx1 = x0 + (x1 - x0) * t;
+		float qy1 = y0 + (y1 - y0) * t;
+		float qx2 = x1 + (x2 - x1) * t;
+		float qy2 = y1 + (y2 - y1) * t;
+		float qx3 = x2 + (x3 - x2) * t;
+		float qy3 = y2 + (y3 - y2) * t;
+		float rx2 = qx1 + (qx2 - qx1) * t;
+		float ry2 = qy1 + (qy2 - qy1) * t;
+		float rx3 = qx2 + (qx3 - qx2) * t;
+		float ry3 = qy2 + (qy3 - qy2) * t;
+		float bx3 = rx2 + (rx3 - rx2) * t;
+		float by3 = ry2 + (ry3 - ry2) * t;
+
+		tip[0].set(qx1, qy1);
+		tip[1].set(rx2, ry2);
+		tip[2].set(bx3, by3);
+	}
 
 	public Path generate_path() {
 		animationTime = System.currentTimeMillis() - genTime;
@@ -221,7 +284,7 @@ public class Branch {
 				}
 
 				if (uf > 0 && uint < c_bez.length) {
-					Vector2D[] tip = Bezier.semiBezier(uf, c_bez[uint].a.x,
+					set_tip(uf, c_bez[uint].a.x,
 							c_bez[uint].a.y, c_bez[uint].b.x, c_bez[uint].b.y,
 							c_bez[uint].c.x, c_bez[uint].c.y, c_bez[uint].d.x,
 							c_bez[uint].d.y);

@@ -23,6 +23,18 @@ public class Bezier {
 		c = pc;
 		d = pd;
 	}
+	
+	public void setCurve(Vector2D v1, Vector2D v2, Vector2D v3,
+			Vector2D v4) {
+		a.x = v2.x;
+		b.x = v2.x + (v3.x - v1.x) / 6;
+		c.x = v3.x + (v2.x - v4.x) / 6;
+		d.x = v3.x;
+		a.y = v2.y;
+		b.y = v2.y + (v3.y - v1.y) / 6;
+		c.y = v3.y + (v2.y - v4.y) / 6;
+		d.y = v3.y;
+	}
 
 	public static Bezier getCurve(Vector2D v1, Vector2D v2, Vector2D v3,
 			Vector2D v4) {
