@@ -74,9 +74,15 @@ public class Vector2D {
 		x = origin.x + xo;
 		y = origin.y + yo;
 	}
+	
+	void setPtDA(float dist, float angle) {
+		x = (float) (dist * Math.cos(angle));
+		y = (float) (dist * Math.sin(angle));
+	}
 
 	static Vector2D getPtDA(float dist, float angle) {
 		return new Vector2D((float) (dist * Math.cos(angle)),
 				(float) (dist * Math.sin(angle)));
 	}
+
 }

@@ -10,6 +10,7 @@ public class Tree {
 	private Rectangle cullbounds;
 	private int width, height;
 	private Vector2D origin, center, zero;
+	private Vector2D[] core;
 	private Paint paint, fillPaint;
 	private int clear_color;
 	private long time, inital_time, inital_delay;
@@ -17,6 +18,8 @@ public class Tree {
 	private float crook_factor;
 	private int vert_factor, twigs, max_branches, grow_speed;
 	private boolean rainbow, wireFill;
+	private int n_branches;
+	private Rectangle bounds;
 
 	Tree() {
 		branches = new ArrayList<Branch>();
@@ -31,26 +34,34 @@ public class Tree {
 		fillPaint.setColor(0xff000000);
 		zero = new Vector2D(0, 0);
 		time = inital_time = System.currentTimeMillis();
+		reset();
 		wireFill = true;
+		cullbounds = new Rectangle();
+		origin = new Vector2D();
+		center = new Vector2D();
+		bounds = new Rectangle();
 	}
 
 	public void reset() {
 		inital_time = System.currentTimeMillis();
 		branches.clear();
+		for (int i = 0; i < max_branches; i++)
+			branches.add(new Branch(vert_factor));
+		n_branches = 0;
 	}
 
 	public void set_dimentions(int w, int h) {
 		width = w;
 		height = h;
-		cullbounds = new Rectangle(-75, -75, width + 75, height + 75);
-		origin = new Vector2D(w / 2, h / 2);
-		center = new Vector2D(w / 2, h / 2);
+		cullbounds.set(-75, -75, width + 75, height + 75);
+		origin.set(w / 2, h / 2);
+		center.set(w / 2, h / 2);
 	}
 
-	private Vector2D segIntersection(Vector2D p1, Vector2D p2, Vector2D p3,
+	private Vector2D segIntersection(float x1, float y1, float x2, float y2, Vector2D p3,
 			Vector2D p4) {
-		float bx = p2.x - p1.x;
-		float by = p2.y - p1.y;
+		float bx = x2 - x1;
+		float by = y2 - y1;
 		float dx = p4.x - p3.x;
 		float dy = p4.y - p3.y;
 
@@ -59,8 +70,8 @@ public class Tree {
 		if (b_dot_d_perp == 0.0f)
 			return null;
 
-		float cx = p3.x - p1.x;
-		float cy = p3.y - p1.y;
+		float cx = p3.x - x1;
+		float cy = p3.y - y1;
 
 		float t = (cx * dy - cy * dx) / b_dot_d_perp;
 		if (t < 0.0f || t > 1.0f)
@@ -70,57 +81,29 @@ public class Tree {
 		if (u < 0.0f || u > 1.0f)
 			return null;
 
-		return new Vector2D(p1.x + t * bx, p1.y + t * by);
+		return new Vector2D(x1 + t * bx, y1 + t * by);
 	}
 
-	private Vector2D findIntersection(Vector2D p1, Vector2D p2) {
-		Rectangle bounds = new Rectangle(p1, p2);
+	private Vector2D findIntersection(float x1, float y1, float x2, float y2) {
+		bounds.set(x1, y1, x2, y2);
 		Vector2D poi;
 
 		for (int i = 0; i < branches.size() - 1; i++) {
-			if (bounds.intersects(branches.get(i).get_bounds())) {
-				for (int j = 0; j < branches.get(i).get_nVert() - 1; j++) {
-					poi = segIntersection(p1, p2, branches.get(i).get_cv(j),
-							branches.get(i).get_cv(j + 1));
-					if (poi != null)
-						return poi;
+			if (branches.get(i).active) {
+				if (bounds.intersects(branches.get(i).get_bounds())) {
+					for (int j = 0; j < branches.get(i).get_nVert() - 1; j++) {
+						poi = segIntersection(x1, y1, x2, y2,
+								branches.get(i).get_cv(j), branches.get(i)
+										.get_cv(j + 1));
+						if (poi != null)
+							return poi;
+					}
 				}
 			}
 		}
 		return null;
 	}
 
-	private ArrayList<Vector2D> generate_center(Vector2D orig, float sangle,
-			float length, float crook, int vert) {
-		float angle, anglev = 0;
-		Vector2D old_pt, new_pt;
-
-		ArrayList<Vector2D> center = new ArrayList<Vector2D>();
-		old_pt = new Vector2D(orig);
-		center.add(old_pt);
-		new_pt = new Vector2D();
-		angle = sangle;
-
-		for (int i = 1; i < vert; i++) {
-			new_pt.x = (float) (old_pt.x + Math.cos(angle) * length / vert);
-			new_pt.y = (float) (old_pt.y + Math.sin(angle) * length / vert);
-			anglev += Math.random() * 2 * crook - crook;
-			angle += anglev;
-
-			Vector2D poi = findIntersection(old_pt, new_pt);
-
-			if (poi != null && i != 1) {
-				center.add(poi);
-				old_pt = new Vector2D(poi);
-				break;
-			} else {
-				center.add(new Vector2D(new_pt));
-				old_pt = new Vector2D(new_pt);
-			}
-
-		}
-		return center;
-	}
 
 	public void set_color(int color) {
 		paint.setColor(color);
@@ -163,6 +146,16 @@ public class Tree {
 
 	public void set_vert(int v) {
 		vert_factor = v;
+		if (v < 5)
+			v = 5;
+		for (int i = 0; i < branches.size(); i++){
+			branches.get(i).set_maxVert(v);
+		}
+		
+		core = new Vector2D[vert_factor];
+		for (int i = 0; i < vert_factor; i++){
+			core[i] = new Vector2D();
+		}
 	}
 
 	public void set_twigs(int t) {
@@ -174,28 +167,108 @@ public class Tree {
 		reset();
 	}
 
+	private int get_unactive() {
+		for (int i = 0; i < branches.size(); i++) {
+			if (branches.get(i).active == false)
+				return i;
+		}
+		return -1;
+	}
+
+	private boolean all_unactive() {
+		for (int i = 0; i < branches.size(); i++) {
+			if (branches.get(i).active)
+				return false;
+		}
+		return true;
+	}
+
+	private int count_unactive() {
+		int c = 0;
+		for (int i = 0; i < branches.size(); i++) {
+			if (branches.get(i).active == false)
+				c++;
+		}
+		return c;
+	}
+
+	private boolean all_active() {
+		for (int i = 0; i < branches.size(); i++) {
+			if (branches.get(i).active == false)
+				return false;
+		}
+		return true;
+	}
+	
+	private void move_forward(int z) {
+		for (int i = 0; i < branches.size(); i++) {
+			if (branches.get(i).active && branches.get(i).zbuf >= z)
+				branches.get(i).zbuf--;
+		}
+	}
+	
+	private int get_z_index(int z){
+		for (int i = 0; i < branches.size(); i++) {
+			if (branches.get(i).active && branches.get(i).zbuf == z)
+				return i;
+		}
+		return -1;
+	}
+
 	public void add_branch(Vector2D orig, float sangle, float length,
 			float width, float crook, int vert, long grow) {
-		Vector2D[] center = null;
-		branches.add(new Branch());
-		int last = branches.size() - 1;
-		branches.get(last).set_growDur(grow);
-		ArrayList<Vector2D> cvert = generate_center(orig, sangle, length,
-				crook, vert);
-		branches.get(last).set_nVert(cvert.size());
-		center = new Vector2D[cvert.size()];
-		for (int i = 0; i < cvert.size(); i++) {
-			center[i] = cvert.get(i);
-		}
-		branches.get(last).set_width(width * cvert.size() / vert);
-		branches.get(last).set_length(length * cvert.size() / vert);
-		branches.get(last).set_center_path(center);
-		branches.get(last).set_start_angle(sangle);
-		branches.get(last).generate_center_curve();
-		branches.get(last).generate_normals();
-		branches.get(last).paint = new Paint(paint);
-		if (rainbow) {
-			branches.get(last).paint.setColor(generate_color());
+		if (!all_active()) {
+			n_branches++;
+			int next = get_unactive();
+			branches.get(next).reset();
+			branches.get(next).zbuf = n_branches - 1;
+			branches.get(next).set_growDur(grow);
+			
+			float angle, anglev = 0;
+			float ox, oy, nx, ny;
+			int nv = 1;
+			
+			
+			ox = orig.x;
+			oy = orig.y;
+			core[0].set(orig);
+
+			angle = sangle;
+
+			for (int i = 1; i < vert; i++) {
+				nx = (float) (ox + Math.cos(angle) * length / vert);
+				ny = (float) (oy + Math.sin(angle) * length / vert);
+				anglev += Math.random() * 2 * crook - crook;
+				angle += anglev;
+
+				Vector2D poi = findIntersection(ox, oy, nx, ny);
+
+				if (poi != null && i != 1) {
+					core[nv].set(poi);
+					nv++;
+					ox = poi.x;
+					oy = poi.y;
+					break;
+				} else {
+					core[nv].set(nx, ny);
+					nv++;
+					ox = nx;
+					oy = ny;
+				}
+			}
+			
+			branches.get(next).set_nVert(nv);
+			branches.get(next).set_width(width * nv / vert);
+			branches.get(next).set_length(length * nv / vert);
+			branches.get(next).set_center_path(core);
+			branches.get(next).set_start_angle(sangle);
+			branches.get(next).generate_center_curve();
+			branches.get(next).generate_normals();
+			branches.get(next).paint.set(paint);
+			if (rainbow) {
+				branches.get(next).paint.setColor(generate_color());
+			}
+			branches.get(next).active = true;
 		}
 	}
 
@@ -232,33 +305,44 @@ public class Tree {
 	}
 
 	public void draw(Canvas canvas) {
+		int i;
 		try {
 			canvas.drawColor(clear_color);
-			for (int i = branches.size() - 1; i >= 0; i--) {
-				branches.get(i).paint.setAlpha(0xff);
-				if (branches.get(i).fadeTime == 0
-						&& branches.get(i).get_length() > height * 10) {
-					branches.get(i).fadeTime = branches.get(i).get_age();
-				} else if (branches.get(i).fadeTime != 0) {
-					long age = branches.get(i).get_age()
-							- branches.get(i).fadeTime;
-					if (age > 1500) {
-						branches.remove(i);
-						i--;
-						continue;
-					} else {
-						branches.get(i).paint
-								.setAlpha((int) (0xff - ((float) (age) * 0xff / 1500)));
+			for (int ct = branches.size() - 1; ct >= 0; ct--) {
+				if (rainbow){
+					i = get_z_index(ct);
+				} else {
+					i = ct;
+				}
+				if (i != -1 && branches.get(i).active) {
+					branches.get(i).paint.setAlpha(0xff);
+					if (branches.get(i).fadeTime == 0
+							&& branches.get(i).get_length() > height * 10) {
+						branches.get(i).fadeTime = branches.get(i).get_age();
+					} else if (branches.get(i).fadeTime != 0) {
+						long age = branches.get(i).get_age()
+								- branches.get(i).fadeTime;
+						if (age > 1500) {
+							branches.get(i).active = false;
+							n_branches--;
+							move_forward(branches.get(i).zbuf);
+							i--;
+							continue;
+						} else {
+							branches.get(i).paint
+									.setAlpha((int) (0xff - ((float) (age) * 0xff / 1500)));
+						}
 					}
-				}
 
-				if (wireFill) {
-					fillPaint.setAlpha(branches.get(i).paint.getAlpha());
-					canvas.drawPath(branches.get(i).generate_path(), fillPaint);
-				}
+					if (wireFill) {
+						fillPaint.setAlpha(branches.get(i).paint.getAlpha());
+						canvas.drawPath(branches.get(i).generate_path(),
+								fillPaint);
+					}
 
-				canvas.drawPath(branches.get(i).generate_path(), branches
-						.get(i).paint);
+					canvas.drawPath(branches.get(i).generate_path(), branches
+							.get(i).paint);
+				}
 			}
 		} catch (IndexOutOfBoundsException e) {
 
@@ -267,9 +351,12 @@ public class Tree {
 
 	private void cullOffscreen() {
 		for (int i = 0; i < branches.size(); i++) {
-			if (!cullbounds.intersects(branches.get(i).get_bounds())) {
-				branches.remove(i);
-				i--;
+			if (branches.get(i).active) {
+				if (!cullbounds.intersects(branches.get(i).get_bounds())) {
+					branches.get(i).active = false;
+					n_branches--;
+					move_forward(branches.get(i).zbuf);
+				}
 			}
 		}
 	}
@@ -278,7 +365,7 @@ public class Tree {
 
 		if (branches.get(i).split == false
 				&& branches.get(i).get_percent_grown() >= 1.0f
-				&& branches.size() + twigs < max_branches
+				&& count_unactive() >= twigs
 				&& branches.get(i).get_length() > height / 20) {
 			for (int j = 0; j < twigs; j++) {
 				int side = j % 2;
@@ -301,21 +388,23 @@ public class Tree {
 		float m;
 		int v;
 		for (int i = 0; i < branches.size(); i++) {
-			points = branches.get(i).get_center_path();
-			v = branches.get(i).get_nVert();
-			for (int j = 0; j < v; j++) {
-				tx = points[j].x;
-				ty = points[j].y;
-				tx -= center.x;
-				ty -= center.y;
-				if (tx != 0.0f || ty != 0.0f) {
-					m = (float) Math.sqrt(tx * tx + ty * ty);
-					tx /= m;
-					ty /= m;
-					tx *= 1000.0f / (float) (vert_factor * max_branches);
-					ty *= 1000.0f / (float) (vert_factor * max_branches);
-					dx += tx;
-					dy += ty;
+			if (branches.get(i).active) {
+				points = branches.get(i).get_center_path();
+				v = branches.get(i).get_nVert();
+				for (int j = 0; j < v; j++) {
+					tx = points[j].x;
+					ty = points[j].y;
+					tx -= center.x;
+					ty -= center.y;
+					if (tx != 0.0f || ty != 0.0f) {
+						m = (float) Math.sqrt(tx * tx + ty * ty);
+						tx /= m;
+						ty /= m;
+						tx *= 1000.0f / (float) (vert_factor * max_branches);
+						ty *= 1000.0f / (float) (vert_factor * max_branches);
+						dx += tx;
+						dy += ty;
+					}
 				}
 			}
 		}
@@ -337,16 +426,20 @@ public class Tree {
 		}
 
 		for (int i = 0; i < branches.size(); i++) {
-			branches.get(i).transform(origin, zero, 1.0f + scale);
+			if (branches.get(i).active) {
+				branches.get(i).transform(origin, zero, 1.0f + scale);
+			}
 		}
 		cullOffscreen();
 
 		for (int i = branches.size() - 1; i >= 0; i--) {
-			split(i);
+			if (branches.get(i).active) {
+				split(i);
+			}
 		}
 
-		if (branches.size() == 0)
-			add_branch(new Vector2D(width / 2, height),
+		if (all_unactive())
+			add_branch(new Vector2D((float) (width / 2 + width * (Math.random() - 0.5f) * 0.75f), height),
 					(float) (Math.PI * 3 / 2), height * 0.8f, height / 50,
 					0.2f, 5, grow_speed);
 
