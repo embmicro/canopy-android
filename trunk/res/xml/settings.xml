@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
 	android:key="branch_settings">
+	<PreferenceScreen android:key="link_preference" android:title="Go Pro!" xmlns:android="http://schemas.android.com/apk/res/android" android:summary="Get the Pro version for more features">
+		<intent android:action="android.intent.action.VIEW"
+			android:data="https://market.android.com/details?id=com.embeddedmicro.branchpro" />
+	</PreferenceScreen>
 
 	<PreferenceCategory android:key="style"
 		android:title="@string/style_title">
@@ -14,8 +18,14 @@
 		<com.embeddedmicro.branch.ColorPreference
 			android:key="background_color" android:defaultValue="0xFF000000"
 			android:title="@string/background_color_title" android:summary="@string/background_color_summary" />
-		
-		<CheckBoxPreference android:title="@string/wire_title" android:summaryOn="@string/wire_on" android:summaryOff="@string/wire_off" android:key="wire" android:disableDependentsState="false"></CheckBoxPreference><CheckBoxPreference android:dependency="wire" android:title="@string/fill_title" android:key="fill" android:summaryOn="@string/fill_on" android:summaryOff="@string/fill_off"></CheckBoxPreference><com.embeddedmicro.branch.SeekBarPreference
+
+		<CheckBoxPreference android:title="@string/wire_title"
+			android:summaryOn="@string/wire_on" android:summaryOff="@string/wire_off"
+			android:key="wire" android:disableDependentsState="false"></CheckBoxPreference>
+		<CheckBoxPreference android:dependency="wire"
+			android:title="@string/fill_title" android:key="fill"
+			android:summaryOn="@string/fill_on" android:summaryOff="@string/fill_off"></CheckBoxPreference>
+		<com.embeddedmicro.branch.SeekBarPreference
 			android:key="branches" android:title="Branches" android:summary="Maximum number of branches"
 			android:defaultValue="50" android:maxLevel="150" android:minLevel="1" />
 		<com.embeddedmicro.branch.SeekBarPreference
@@ -32,10 +42,10 @@
 			android:key="zoom" android:title="Speed" android:summary="Set the zoom speed"
 			android:defaultValue="5" android:maxLevel="10" android:minLevel="1" />
 
-	
 
 
-</PreferenceCategory>
+
+	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/render_title"
 		android:key="render">

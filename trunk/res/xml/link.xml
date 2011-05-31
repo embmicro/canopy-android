@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	android:key="link_preference">
+	<intent android:action="android.intent.action.VIEW"
+		android:data="https://market.android.com/details?id=com.embeddedmicro.branchpro" />
+</PreferenceScreen>
